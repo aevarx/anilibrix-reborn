@@ -67,7 +67,7 @@ export default {
         {
           title: 'Перезагрузить приложение',
           value: this.shortcuts['reload'],
-          action: () => require('@electron/remote').getCurrentWindow().reload(),
+          action: () => window.electronAPI.reloadWindow(),
         },
         {
           title: 'Обновить приложение',
@@ -80,7 +80,7 @@ export default {
         {
           title: 'Свернуть приложение',
           value: this.shortcuts['minimize'],
-          action: () => require('@electron/remote').getCurrentWindow().minimize(),
+          action: () => window.electronAPI.minimizeWindow(),
         },
         {
           title: 'Закрыть приложение',

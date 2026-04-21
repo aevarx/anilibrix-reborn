@@ -1,6 +1,10 @@
-import {app, BrowserWindow, ipcMain} from 'electron'
+import {app, BrowserWindow, ipcMain, shell} from 'electron'
 import proxy from 'node-global-proxy';
 let proxyServer
+
+if (process.env.NODE_ENV === 'development') {
+  process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
+}
 
 if (app.commandLine.hasSwitch('proxy-server')) {
   proxyServer = app.commandLine.getSwitchValue('proxy-server')
@@ -168,6 +172,7 @@ app.on('ready', async () => {
 
   if (process.env.NODE_ENV === 'development') mainWindow.webContents.openDevTools()
 
+
   require('@electron/remote/main').enable(mainWindow.webContents)
   require('@electron/remote/main').enable(torrentWindow.webContents)
 
@@ -180,6 +185,14 @@ app.on('ready', async () => {
       destroyRichPresence()
       app.quit()
     }) // Main window close event
+
+  mainWindow.on('enter-full-screen', () => {
+    mainWindow.webContents.send('window:enter-full-screen')
+  })
+
+  mainWindow.on('leave-full-screen', () => {
+    mainWindow.webContents.send('window:leave-full-screen')
+  })
 
   // Create menu
   // Create tray icon
@@ -214,6 +227,58 @@ const appHandlers = () => {
   handleAppSystemInfo(),
   handleGetTitleV1New()
 }
+
+ipcMain.on('app-action', (event, action = {}) => {
+  const { type, payload } = action
+  const mainWindow = Main.getWindow()
+
+  if (type === 'open-external' && payload && typeof payload.url === 'string') {
+    shell.openExternal(payload.url)
+    return
+  }
+
+  if (type === 'window-reload' && mainWindow) {
+    mainWindow.reload()
+    return
+  }
+
+  if (type === 'window-minimize' && mainWindow) {
+    mainWindow.minimize()
+    return
+  }
+
+  if (type === 'window-toggle-maximize' && mainWindow) {
+    mainWindow.isMaximized()
+      ? mainWindow.unmaximize()
+      : mainWindow.maximize()
+    return
+  }
+
+  if (type === 'app-quit') {
+    app.quit()
+    return
+  }
+
+  if (type === 'app-exit') {
+    app.exit(payload && Number.isInteger(payload.code) ? payload.code : 0)
+    return
+  }
+
+  if (type === 'set-app-user-model-id' && payload && typeof payload.id === 'string') {
+    app.setAppUserModelId(payload.id)
+  }
+})
+
+ipcMain.handle('app-query', (event, query = {}) => {
+  const { type } = query
+  const mainWindow = Main.getWindow()
+
+  if (type === 'window-is-full-screen' && mainWindow) {
+    return mainWindow.isFullScreen()
+  }
+
+  return false
+})
 
 /**
  * Torrents handlers

@@ -3,7 +3,6 @@
 process.env.BABEL_ENV = 'renderer';
 
 const path = require('path');
-const {dependencies} = require('../package.json');
 const webpack = require('webpack');
 
 const webpackAppConfig = require('./../webpack.config');
@@ -15,15 +14,6 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-/**
- * List of node_modules to include in webpack bundle
- *
- * Required for specific packages like Vue UI libraries
- * that provide pure *.vue files that need compiling
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/webpack-configurations.html#white-listing-externals
- */
-let whiteListedModules = ['vue'];
-
 let rendererConfig = {
   // devtool: '#cheap-module-eval-source-map',
   devtool: 'hidden-source-map',
@@ -31,10 +21,7 @@ let rendererConfig = {
     renderer: path.join(__dirname, '../src/renderer/main.js'),
     webtorrent: path.join(__dirname, '../src/renderer/webtorrent.js'),
   },
-  externals: [
-    ...Object.keys(dependencies || {})
-      .filter(d => !whiteListedModules.includes(d))
-  ],
+  externals: [],
   module: {
     rules: [
       {
@@ -47,8 +34,16 @@ let rendererConfig = {
             options: {
               implementation: require('sass'),
               sassOptions: {
-                fiber: require('fibers')
-              },
+                fiber: false,
+                quietDeps: true,
+                silenceDeprecations: [
+                  'legacy-js-api',
+                  'import',
+                  'global-builtin',
+                  'slash-div',
+                  'if-function'
+                ]
+              }
             },
           },
         ],
@@ -67,8 +62,20 @@ let rendererConfig = {
       },
       {
         test: /\.js$/,
-        use: 'babel-loader',
-        exclude: /node_modules/
+        use: {
+          loader: 'babel-loader',
+          options: {
+            plugins: [
+              '@babel/plugin-transform-optional-chaining',
+              '@babel/plugin-transform-nullish-coalescing-operator'
+            ]
+          }
+        },
+        exclude: filePath => {
+          const isNodeModule = /node_modules/.test(filePath)
+          const isWebtorrentPackage = /node_modules[\\/](?:\\.pnpm[\\/]webtorrent@.*[\\/]node_modules[\\/]webtorrent|webtorrent)[\\/]/.test(filePath)
+          return isNodeModule && !isWebtorrentPackage
+        }
       },
       {
         test: /\.node$/,
@@ -189,12 +196,13 @@ let rendererConfig = {
   ],
   output: {
     filename: '[name].js',
-    libraryTarget: 'commonjs2',
     path: path.join(__dirname, '../dist/electron')
   },
   resolve: {
     alias: {
       '@': path.join(__dirname, '../src/renderer'),
+      // Webpack 4 expects alias values to be strings, so we map fibers to a local no-op stub.
+      'fibers': path.join(__dirname, 'stubs/fibers.js'),
       'vue': 'vue/dist/vue.esm.js',
       //'vue$': 'vue/dist/vue.esm.js',
       ...webpackAppConfig.resolve.alias

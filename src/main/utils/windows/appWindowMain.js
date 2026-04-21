@@ -1,5 +1,5 @@
 import Window from './appWindow'
-import * as path from 'path'
+import path from 'path'
 
 class MainWindow extends Window {
   /**
@@ -8,6 +8,7 @@ class MainWindow extends Window {
    * @return Object
    */
   getWindowConfiguration () {
+    const isDev = process.env.NODE_ENV === 'development'
     const width = 1120
     const height = 720
     const minWidth = 820
@@ -32,15 +33,19 @@ class MainWindow extends Window {
       titleBarStyle: 'hiddenInset',
       useContentSize: true,
       webPreferences: {
+        preload: isDev
+          ? path.resolve(process.cwd(), 'dist/electron/preload.js')
+          : path.resolve(__dirname, 'preload.js'),
         webgl: true,
         webviewTag: true,
-        webSecurity: false,
+        webSecurity: true,
         autoplayPolicy: 'no-user-gesture-required',
-        nodeIntegration: true,
-        contextIsolation: false,
+        // Temporary compatibility mode for legacy renderer code in development.
+        nodeIntegration: isDev,
+        contextIsolation: !isDev,
         enableRemoteModule: true,
-        experimentalFeatures: true,
-        allowRunningInsecureContent: true
+        experimentalFeatures: false,
+        allowRunningInsecureContent: false
       },
       backgroundColor: '#121212'
     }

@@ -58,7 +58,6 @@
 
 // Images
 import LibriaTyan03 from '@assets/images/libria-tyan/LibriaTyan03.svg'
-import { ipcRenderer } from "electron";
 // Utils
 import { required } from 'vuelidate/lib/validators'
 import { BackViewMixin } from '@mixins/views'
@@ -83,7 +82,7 @@ export default {
     password: { required },
   },
   mounted () {
-    ipcRenderer.on('VK_CODE', async (event, session) => {
+    window.electronAPI.on('VK_CODE', async (session) => {
       try {
         this.loading = true
         await this.$store.dispatchPromise('app/account/setSession', session)
@@ -106,7 +105,7 @@ export default {
     })
   },
   beforeDestroy() {
-    ipcRenderer.removeAllListeners('VK_CODE')
+    window.electronAPI.removeAllListeners('VK_CODE')
   },
   methods: {
 

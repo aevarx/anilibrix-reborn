@@ -1,5 +1,3 @@
-import favorites from '../favorites'
-import app from '../app'
 const PUSH_TO_RELEASES = 'PUSH_TO_RELEASES'
 const SORT_NOTIFICATIONS = 'SORT_NOTIFICATIONS'
 const CLEAR_NOTIFICATIONS = 'CLEAR_NOTIFICATIONS'
@@ -10,10 +8,6 @@ export default {
   namespaced: true,
   state: {
     items: []
-  },
-  modules: {
-    favorites,
-    app
   },
   mutations: {
 

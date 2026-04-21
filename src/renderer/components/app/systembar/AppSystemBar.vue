@@ -66,7 +66,7 @@ export default {
      * @return void
      */
     closeApp () {
-      require('@electron/remote').app.quit()
+      window.electronAPI.quitApp()
     },
 
     /**
@@ -75,7 +75,7 @@ export default {
      * @return void
      */
     minimizeApp () {
-      require('@electron/remote').getCurrentWindow().minimize()
+      window.electronAPI.minimizeWindow()
     },
 
     /**
@@ -84,12 +84,7 @@ export default {
      * @return void
      */
     maximizeApp () {
-
-      const window = require('@electron/remote').getCurrentWindow()
-
-      window.isMaximized()
-        ? window.unmaximize()
-        : window.maximize()
+      window.electronAPI.toggleMaximizeWindow()
     }
   }
 

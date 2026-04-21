@@ -47,7 +47,7 @@ export default {
         if (title && name) {
 
           // Set notification name
-          require('@electron/remote').app.setAppUserModelId(meta.name)
+          window.electronAPI.setAppUserModelId(meta.name)
 
           // Create notification
           // If the user clicks in the Notifications Center, show the app

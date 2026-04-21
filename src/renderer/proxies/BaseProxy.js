@@ -5,6 +5,20 @@ import FormData from 'form-data'
 import { meta, version } from '@package'
 
 export default class BaseProxy {
+  normalizeApiEndpoint (endpoint) {
+    if (!endpoint || endpoint.includes('anilibriaqt.anilib.top')) {
+      return process.env.API_ENDPOINT_URL
+    }
+    return endpoint
+  }
+
+  normalizeStaticEndpoint (endpoint) {
+    if (!endpoint || endpoint.includes('anilibriaqt.anilib.top')) {
+      return process.env.STATIC_ENDPOINT_URL
+    }
+    return endpoint
+  }
+
   /**
    * The method used to perform an AJAX-request.
    *
@@ -54,8 +68,8 @@ export default class BaseProxy {
    * @return {string}
    */
   getApiEndpoint () {
-    const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.endpoint
-    console.log('Endpoint', endpoint)
+    const rawEndpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.endpoint
+    const endpoint = this.normalizeApiEndpoint(rawEndpoint)
     return endpoint + '/public/api/index.php'
   }
 
@@ -67,7 +81,6 @@ export default class BaseProxy {
    */
   getApiEndpointExtend (api_version = "v1") {
     const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.ext_endpoint + `/api/${api_version}`
-    console.log('Extend endpoint', endpoint)
     return endpoint
   }
 
@@ -78,25 +91,24 @@ export default class BaseProxy {
    */
   getAppUpdateChannelEndpoint () {
     const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.app_update_channel_endpoint
-    console.log('Application update channel endpoint', endpoint)
     return endpoint
   }
 
   getTorrentEndpoint () {
-    const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.endpoint
-    console.log('Endpoint for torrent', endpoint)
+    const rawEndpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.endpoint
+    const endpoint = this.normalizeApiEndpoint(rawEndpoint)
     return endpoint
   }
 
   getApiLoginEndpoint () {
-    const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.endpoint
-    console.log('Endpoint for login', endpoint)
+    const rawEndpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.endpoint
+    const endpoint = this.normalizeApiEndpoint(rawEndpoint)
     return endpoint + '/public/login.php'
   }
 
   getApiLogoutEndpoint () {
-    const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.endpoint
-    console.log('Endpoint for logout', endpoint)
+    const rawEndpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.endpoint
+    const endpoint = this.normalizeApiEndpoint(rawEndpoint)
     return endpoint + '/public/logout.php'
   }
 
@@ -107,8 +119,8 @@ export default class BaseProxy {
    */
   getStaticEndpoint () {
     // eslint-disable-next-line camelcase
-    const endpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.static_endpoint
-    console.log('Endpoint for static', endpoint)
+    const rawEndpoint = require('@store/index').default?.state?.app?.settings?.system?.api?.static_endpoint
+    const endpoint = this.normalizeStaticEndpoint(rawEndpoint)
     return endpoint
   }
 

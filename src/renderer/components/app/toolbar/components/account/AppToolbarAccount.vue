@@ -55,7 +55,6 @@
             <v-divider :key="`d:${k}`"/>
           </template>
 
-
           <!-- Logout -->
           <v-list-item @click="logout">
             <v-list-item-subtitle>Выход</v-list-item-subtitle>

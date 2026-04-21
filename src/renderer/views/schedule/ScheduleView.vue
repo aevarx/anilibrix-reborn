@@ -11,9 +11,9 @@
       </v-tabs>
       <v-container>
         <v-row>
-          <v-col v-for="release in data[selectedDayIndex].list" :key="release.id" cols="12" sm="6" md="4" lg="3">
+          <v-col v-for="release in selectedDayList" :key="release.id" cols="12" sm="6" md="4" lg="3">
             <v-card class="schedule-card" :ref="release.id" @click="toRelease(release)">
-              <v-img :src="staticEndpointURL + release.posters.small.url" class="schedule-image">
+              <v-img :src="getPosterUrl(release)" class="schedule-image">
                 <div class="overlay">
                   <v-card-title class="title">{{ release.names.ru }}</v-card-title>
                   <v-card-subtitle class="subtitle">Эпизоды: {{ release.player.episodes.string }}</v-card-subtitle>
@@ -71,7 +71,18 @@ export default {
   },
 
   methods: {
+    getPosterUrl(release) {
+      const posterUrl = release?.posters?.small?.url || ''
+      if (!posterUrl) return ''
+      if (/^https?:\/\//.test(posterUrl)) return posterUrl
+      return `${this.staticEndpointURL}${posterUrl}`
+    },
     toRelease
+  },
+  computed: {
+    selectedDayList() {
+      return this.data?.[this.selectedDayIndex]?.list || []
+    }
   },
 };
 </script>

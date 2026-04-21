@@ -1,0 +1,12 @@
+allowBuilds:
+  '@parcel/watcher': true
+  bufferutil: true
+  core-js: true
+  electron: true
+  fibers: true
+  highlight.js: true
+  node-cron: true
+  protobufjs: true
+  register-scheme: true
+  utf-8-validate: true
+  utp-native: true

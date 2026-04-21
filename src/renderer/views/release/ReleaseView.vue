@@ -67,8 +67,6 @@ import router from '@router'
 import { catGirlFetch } from '@utils/fetch'
 import ReleaseProxy from '@proxies/release'
 
-const domain = require('@store/index').default?.state?.app?.settings?.system?.api?.ext_endpoint + '/api'
-
 const props = {
   releaseId: {
     type: [String, Number],
@@ -93,10 +91,8 @@ export default {
   },
 
   async mounted () {
-    const id = this._release?.id
     if (this._release?.id) {
       this.loadLastWatchedEpisode()
-      await this.fetchAdditional(id)
     }
   },
 
@@ -180,10 +176,24 @@ export default {
   },
 
   methods: {
+    getExtApiBaseUrl () {
+      const extEndpoint = this.$store?.state?.app?.settings?.system?.api?.ext_endpoint || process.env.EXT_API_SERVER || ''
+      return `${extEndpoint}/api`
+    },
+    shouldSkipRelatedDataFetch () {
+      const extEndpoint = this.$store?.state?.app?.settings?.system?.api?.ext_endpoint || process.env.EXT_API_SERVER || ''
+      return extEndpoint.includes('api.anilibria.tv')
+    },
     router () {
       return router
     },
     async fetchAdditional() {
+      if (this.shouldSkipRelatedDataFetch()) {
+        this.franchises = []
+        this.team = null
+        return
+      }
+
       try {
         const { franchises, team } = await this.loadFranchisesAndTeam()
 
@@ -193,13 +203,25 @@ export default {
 
         this.franchises = this.formatFranchises(franchises, additionalData)
       } catch (error) {
-        console.error(error)
-        this.$toasted.error('Ошибка загрузки связанных данных')
+        const status = error?.status || null
+        const isDeprecatedOrMissing = status === 404 || status === 410
+
+        // v3 external API can be unavailable/deprecated; release page should still work without related block.
+        this.franchises = []
+        this.team = null
+        if (!isDeprecatedOrMissing) {
+          this.$toasted.error('Ошибка загрузки связанных данных')
+        }
       }
     },
 
     async loadFranchisesAndTeam() {
-      return await catGirlFetch(`${domain}/v3/title?filter=franchises,team&playlist_type=array&id=${this.releaseId}`)
+      const domain = this.getExtApiBaseUrl()
+      const payload = await catGirlFetch(`${domain}/v3/title?filter=franchises,team&playlist_type=array&id=${this.releaseId}`)
+      return {
+        franchises: payload?.franchises || [],
+        team: payload?.team || null
+      }
     },
 
     extractReleaseIds(franchises) {
@@ -213,6 +235,9 @@ export default {
     },
 
     async loadAdditionalData(releaseIds) {
+      if (!releaseIds.length) return []
+      const domain = this.getExtApiBaseUrl()
+
       const result = await Promise.allSettled(
           releaseIds.map((id) => catGirlFetch(
             `${domain}/v3/title?filter=status.string,id,type.full_string,string,names.ru,posters.medium&include=raw_poster&description_type=plain&playlist_type=object&id=${id}`
@@ -220,10 +245,8 @@ export default {
       )
 
       return result
-        .filter(({ value, reason }) => {
-          return reason?.status !== 404
-        })
-        .map(({ value }) => value)
+        .filter((item) => item.status === 'fulfilled' && item.value && typeof item.value === 'object')
+        .map((item) => item.value)
     },
 
     loadLastWatchedEpisode() {

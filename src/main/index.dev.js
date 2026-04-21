@@ -12,6 +12,10 @@
 
 // Install `vue-devtools`
 require('electron').app.on('ready', () => {
+  if (process.env.ENABLE_VUE_DEVTOOLS !== '1') {
+    console.log('Vue Devtools extension is disabled. Set ENABLE_VUE_DEVTOOLS=1 to enable.')
+    return
+  }
 
   const {
     default: installExtension,

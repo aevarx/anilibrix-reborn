@@ -13,7 +13,8 @@ const webpackAppConfig = require('./../webpack.config');
 let mainConfig = {
   devtool: 'hidden-source-map',
   entry: {
-    main: path.join(__dirname, '../src/main/index.js')
+    main: path.join(__dirname, '../src/main/index.js'),
+    preload: path.join(__dirname, '../src/main/preload.js')
   },
   externals: [
     ...Object.keys(dependencies || {}),

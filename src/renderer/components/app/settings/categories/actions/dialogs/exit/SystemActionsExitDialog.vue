@@ -49,7 +49,7 @@ export default {
      * @return void
      */
     exitApp () {
-      require('@electron/remote').app.exit(0)
+      window.electronAPI.exitApp(0)
     }
   }
 

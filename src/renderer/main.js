@@ -37,6 +37,7 @@ axiosRetry(axios, {
   }
 })
 Vue.config.productionTip = false
+Vue.config.devtools = false
 
 // Initialize sentry
 // Initialize yandex metrika

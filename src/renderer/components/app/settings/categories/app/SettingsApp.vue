@@ -19,7 +19,6 @@
 <script>
 
 import { meta, repository } from '@package'
-import { shell } from 'electron'
 
 export default {
   computed: {
@@ -34,12 +33,12 @@ export default {
         {
           title: 'Анилибрия',
           value: meta.links.anilibria,
-          action: () => require('@electron/remote').shell.openExternal(meta.links.anilibria),
+          action: () => window.electronAPI.openExternal(meta.links.anilibria),
         },
         {
           title: 'Исходный код',
           value: '/anilibrix',
-          action: () => require('@electron/remote').shell.openExternal(repository.url)
+          action: () => window.electronAPI.openExternal(repository.url)
         },
       ]
     },

@@ -126,7 +126,20 @@ function startElectron () {
     args = args.concat(process.argv.slice(2))
   }
 
-  electronProcess = spawn(electron, args)
+  const env = { ...process.env }
+  if (env.NODE_OPTIONS) {
+    env.NODE_OPTIONS = env.NODE_OPTIONS
+      .split(/\s+/)
+      .filter(option => option && option !== '--openssl-legacy-provider')
+      .join(' ')
+
+    if (!env.NODE_OPTIONS) {
+      delete env.NODE_OPTIONS
+    }
+  }
+  delete env.ELECTRON_RUN_AS_NODE
+
+  electronProcess = spawn(electron, args, { env })
   
   electronProcess.stdout.on('data', data => {
     electronLog(data, 'blue')
@@ -135,7 +148,7 @@ function startElectron () {
     electronLog(data, 'red')
   })
 
-  electronProcess.on('close', () => {
+  electronProcess.on('close', (code, signal) => {
     if (!manualRestart) process.exit()
   })
 }

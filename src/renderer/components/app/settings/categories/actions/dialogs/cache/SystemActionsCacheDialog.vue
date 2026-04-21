@@ -53,7 +53,7 @@ export default {
       this.loading = true
       this.$store
         .dispatchPromise('RESET_STORE')
-        .then(() => require('@electron/remote').getCurrentWindow().reload())
+        .then(() => window.electronAPI.reloadWindow())
         .finally(() => this.loading = false)
     }
   }

@@ -40,7 +40,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-13]
-        node-version: [14.x]
+        node-version: [22]
 
     env:
       ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
@@ -50,10 +50,10 @@ jobs:
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -67,7 +67,7 @@ jobs:
         run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - name: Cache Node.js modules
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ${{ steps.yarn-cache.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles(format('{0}{1}', github.workspace, '/yarn.lock')) }}
@@ -75,7 +75,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Cache Electron
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/.cache/electron
           key: ${{ runner.os }}-electron-cache-${{ hashFiles(format('{0}{1}', github.workspace, '/yarn.lock')) }}
@@ -83,7 +83,7 @@ jobs:
             ${{ runner.os }}-electron-cache-
 
       - name: Cache Electron-Builder
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/.cache/electron-builder
           key: ${{ runner.os }}-electron-builder-cache-${{ hashFiles(format('{0}{1}', github.workspace, '/yarn.lock')) }}
@@ -130,7 +130,7 @@ jobs:
 
       - name: Upload artifact
         if: ${{ inputs.artifact_upload == true || startsWith(github.ref, 'refs/heads/main')}}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Anilibrix Plus
           path: ${{env.OUT_DIR}}/*.dmg

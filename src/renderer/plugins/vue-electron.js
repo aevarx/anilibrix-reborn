@@ -1,6 +1,10 @@
 export default {
   install: function (Vue) {
-    Vue.prototype.$electron = require('electron')
-    // Vue.prototype.$electron.remote = require('@electron/remote');
+    Vue.prototype.$electron = {
+      ipcRenderer: {
+        send: (channel, data) => window.electronAPI.send(channel, data),
+        on: (channel, listener) => window.electronAPI.on(channel, listener),
+      }
+    }
   }
 }
