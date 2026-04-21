@@ -1,0 +1,113 @@
+import BaseProxy from '@proxies/BaseProxy'
+import { catGirlFetch } from '@utils/fetch'
+import store from "@store";
+
+export default class ReleaseProxy extends BaseProxy {
+  /**
+   * Get last releases
+   *
+   * @return {Promise}
+   */
+  async getReleases (parameters = {}) {
+    const data = this.getFormDataObject({
+      query: 'list',
+      perPage: 14
+    })
+    const params = {
+      data,
+      headers: data.getHeaders(),
+      ...parameters
+    }
+    const response = await this.submit('POST', this.getApiEndpoint(), params)
+
+    return this.handleResponse(response.data)
+  }
+
+  /**
+   * Get release with provided id
+   *
+   * @param releaseId
+   * @param parameters
+   * @return {Promise<unknown>}
+   */
+  async getRelease (releaseId, parameters = {}) {
+    const data = this.getFormDataObject({
+      query: 'release',
+      id: releaseId
+    })
+    const params = {
+      data,
+      headers: data.getHeaders(),
+      ...parameters
+    }
+    const response = await this.submit('POST', this.getApiEndpoint(), params)
+    const { playlist } = response.data.data
+    if (store.state.app.settings.player.rutube) {
+      const promises = []
+
+      for (const ep in playlist) {
+        if (playlist[ep].sources.is_rutube) {
+          promises.push(
+            catGirlFetch(`https://rutube.ru/api/play/options/${playlist[ep].rutube_id}/?no_404=true&referer&pver=v2`, {}, 3000)
+              .then(x => (playlist[ep].fullhd = x.video_balancer.m3u8))
+              .catch(x => console.log(x))
+          )
+        }
+      }
+      await Promise.allSettled(promises)
+    }
+    return this.handleResponse(response.data)
+  }
+
+  /**
+   * Search releases by name
+   *
+   * @param searchQuery
+   * @param parameters
+   * @return {Promise<unknown>}
+   */
+  async searchReleases (searchQuery, parameters = {}) {
+    const data = this.getFormDataObject({
+      query: 'search',
+      search: searchQuery
+    })
+    const params = {
+      data,
+      headers: data.getHeaders(),
+      ...parameters
+    }
+    const response = await this.submit('POST', this.getApiEndpoint(), params)
+
+    return this.handleResponse(response.data)
+  }
+
+  /**
+   * Get torrent file
+   *
+   * @param url
+   * @param parameters
+   * @return {Promise<unknown>}
+   */
+  async getReleaseTorrent (url, parameters = {}) {
+    console.log('Get release torrent', this.getTorrentEndpoint() + url)
+    if (url) {
+      // eslint-disable-next-line no-return-await
+      return await this.submit('GET', this.getTorrentEndpoint() + url, {
+        ...parameters,
+        responseType: 'arraybuffer'
+      })
+    } else {
+      return null
+    }
+  }
+
+  /**
+   * Get release poster
+   *
+   * @param src
+   * @return {string|null}
+   */
+  getReleasePosterPath (src) {
+    return src ? this.getStaticEndpoint() + src : null;
+  }
+}

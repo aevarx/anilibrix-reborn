@@ -1,0 +1,25 @@
+@import "plugins/vuetify/style";
+
+*, *::after, *::before {
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+html, body {
+  overflow-y: hidden !important;
+  user-select: none;
+}
+
+.allow-select {
+  user-select: text !important;
+}
+
+::-webkit-scrollbar-thumb {
+  cursor: pointer;
+  background-color: #353535;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  background-color: #1d1d1d;
+}

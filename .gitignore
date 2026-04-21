@@ -1,0 +1,14 @@
+.yarn
+.DS_Store
+/release/
+node_modules/
+npm-debug.log
+npm-debug.log.*
+thumbs.db
+!.gitkeep
+.idea
+.vscode
+dist
+.env
+out/
+package-lock.json
