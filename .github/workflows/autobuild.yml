@@ -52,17 +52,40 @@ jobs:
         run: |
           node -e "const c=require('crypto'); try { c.createHash('md4').update('x').digest('hex'); console.log('DBG_H1 md4 supported'); } catch (e) { console.log('DBG_H1 md4 unsupported', e.message); }"
 
-      - name: Build app
+      - name: Build app (webpack)
         env:
           NODE_OPTIONS: --openssl-legacy-provider
         run: pnpm run build
+
+      # package.json extraFiles points at placeholder path; real releases use _build_.py
+      - name: Ensure updater path exists for electron-builder
+        shell: bash
+        run: mkdir -p path_to_updater && touch path_to_updater/.gitkeep
+
+      - name: Package app (Windows installer + portable)
+        if: runner.os == 'Windows'
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+        run: pnpm exec electron-builder --win --x64 --publish never
+
+      - name: Package app (Linux AppImage)
+        if: runner.os == 'Linux'
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+        run: pnpm exec electron-builder --linux AppImage --x64 --publish never
+
+      - name: Package app (macOS dmg)
+        if: runner.os == 'macOS'
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+        run: pnpm exec electron-builder --mac dmg --publish never
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: anilibrix-${{ matrix.os }}-${{ github.sha }}
           if-no-files-found: warn
-          path: |
-            dist/**
-            release/**
-            out/**
+          path: release/**

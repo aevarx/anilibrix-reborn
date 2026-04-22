@@ -17,7 +17,8 @@
     "scripts": {
         "build": "node .electron-vue/build.js",
         "serve": "node .electron-vue/dev-runner.js",
-        "release": "pnpm run build && electron-builder --dir",
+        "release": "pnpm run build && electron-builder -wml -c.compression=store --publish never",
+        "release:dir": "pnpm run build && electron-builder --dir",
         "release:mac": "pnpm run build && electron-builder -m -c.compression=store --publish never",
         "release:linux": "pnpm run build && electron-builder -l -c.compression=store --publish never",
         "release:windows": "pnpm run build && electron-builder -w -c.compression=maximum --publish never",

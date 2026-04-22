@@ -1,6 +1,7 @@
 .yarn
 .DS_Store
 /release/
+path_to_updater/
 node_modules/
 npm-debug.log
 npm-debug.log.*
