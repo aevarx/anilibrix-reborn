@@ -26,17 +26,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # setup-node with cache: pnpm invokes pnpm; it must exist before this step
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
-
-      - name: Enable Corepack and pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@latest --activate
-          pnpm --version
 
       - name: Create .env from example
         run: node -e "require('fs').copyFileSync('.env.example', '.env')"
