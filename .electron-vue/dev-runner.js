@@ -155,8 +155,19 @@ function startElectron () {
 
 function electronLog (data, color) {
   let log = ''
+  const skipPatterns = [
+    /org\.freedesktop\.UPower/i,
+    /DBus\.Error\.ServiceUnknown/i,
+    /gpu_init\.cc\(453\).*swiftshader/i,
+    /command_buffer_proxy_impl\.cc\(125\).*CreateCommandBuffer/i,
+    /viz_main_impl\.cc\(161\).*GPU process/i
+  ]
+
   data = data.toString().split(/\r?\n/)
   data.forEach(line => {
+    if (skipPatterns.some(pattern => pattern.test(line))) {
+      return
+    }
     log += `  ${line}\n`
   })
   if (/[0-9A-z]+/.test(log)) {

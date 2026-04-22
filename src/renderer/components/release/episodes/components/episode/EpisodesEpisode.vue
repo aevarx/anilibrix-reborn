@@ -70,7 +70,7 @@ export default {
 
   methods: {
     formatTimestamp(time) {
-      return moment.unix(time).format('DD.MM.YYYY HH:mm:ss')
+      return moment.unix(time).format('DD.MM.YYYY')
     }
   },
 

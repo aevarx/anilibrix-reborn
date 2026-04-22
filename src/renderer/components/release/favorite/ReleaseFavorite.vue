@@ -10,7 +10,6 @@
 
     <v-icon v-if="isInFavorite">mdi-star</v-icon>
     <v-icon v-else>mdi-star-outline</v-icon>
-    <span v-if="favoriteRating" class="ml-1">{{ favoriteRating }}</span>
 
   </v-btn>
 </template>
@@ -43,15 +42,6 @@ export default {
      */
     isInFavorite () {
       return this.$store.getters['favorites/isInFavorite'](this.release)
-    },
-
-    /**
-    * Get release favorite rating
-    *
-    * @return {*}
-    */
-    favoriteRating() {
-      return this.$__get(this.release, 'favoriteRating.text')
     }
 
   },

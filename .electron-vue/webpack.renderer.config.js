@@ -74,7 +74,8 @@ let rendererConfig = {
         exclude: filePath => {
           const isNodeModule = /node_modules/.test(filePath)
           const isWebtorrentPackage = /node_modules[\\/](?:\\.pnpm[\\/]webtorrent@.*[\\/]node_modules[\\/]webtorrent|webtorrent)[\\/]/.test(filePath)
-          return isNodeModule && !isWebtorrentPackage
+          const isPlyrPackage = /node_modules[\\/](?:\\.pnpm[\\/]plyr@.*[\\/]node_modules[\\/]plyr|plyr)[\\/]/.test(filePath)
+          return isNodeModule && !(isWebtorrentPackage || isPlyrPackage)
         }
       },
       {

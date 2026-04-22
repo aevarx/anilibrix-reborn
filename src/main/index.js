@@ -60,6 +60,8 @@ import Menu from './utils/menu'
 import { openWindowInterceptor } from '@main/utils/windows/openWindowInterceptor'
 import {showAppError} from "@main/handlers/notifications/notificationsHandler";
 
+const isWsl = process.platform === 'linux' && !!(process.env.WSL_DISTRO_NAME || process.env.WSL_INTEROP)
+
 app.commandLine.appendSwitch('--no-sandbox')
 
 const { discordActivity } = require('./utils/discord')
@@ -87,6 +89,9 @@ if (process.env.NODE_ENV !== 'development') {
 app.commandLine.appendSwitch('disable-site-isolation-trials')
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required')
+if (process.env.NODE_ENV === 'development' && isWsl) {
+  app.commandLine.appendSwitch('disable-gpu')
+}
 
 process.on('uncaughtException', error => {
   console.log('Unhandled Error', error)
@@ -103,35 +108,7 @@ app.on('window-all-closed', () => {
 })
 
 app.on('web-contents-created', (event, webContents) => {
-  webContents.on('did-finish-load', async () => {
-    if (webContents.getURL().startsWith('https://id.vk.com/')) {
-      webContents.on('will-redirect', async (event, url) => {
-        if (!url.startsWith('https://www.anilibria.tv/')) {
-          return true
-        }
-
-        const cookies = await webContents.session.cookies.get({ url: 'https://www.anilibria.tv' })
-
-        const { value: sessionId } = cookies.find(cookie => cookie.name === 'PHPSESSID') || {}
-
-        if (sessionId) {
-          Main.getWindow().webContents.send('VK_CODE', sessionId)
-        }
-
-        BrowserWindow.fromWebContents(webContents).hide()
-
-        webContents.on('did-finish-load', async () => {
-          await webContents.session.clearStorageData()
-          webContents.destroy()
-        })
-
-        return true
-      });
-    }
-  })
-
   webContents.setWindowOpenHandler(openWindowInterceptor)
-  webContents.setUserAgent(`${meta.name}/${version}`)
   webContents.on('will-attach-webview', (event, webPreferences, params) => {
     // Strip away preload scripts if unused or verify their location is legitimate
     delete webPreferences.preload
@@ -170,7 +147,9 @@ app.on('ready', async () => {
       .setProxy({ proxyRules: proxyServer })
   }
 
-  if (process.env.NODE_ENV === 'development') mainWindow.webContents.openDevTools()
+  if (process.env.NODE_ENV === 'development' && process.env.OPEN_DEVTOOLS === '1') {
+    mainWindow.webContents.openDevTools()
+  }
 
 
   require('@electron/remote/main').enable(mainWindow.webContents)

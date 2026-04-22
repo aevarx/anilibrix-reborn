@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
 const validSendChannels = ['app-action', 'torrent-control', 'player-event']
-const validOnChannels = ['app-update', 'torrent-status', 'player-state', 'VK_CODE', 'app:error', 'window:enter-full-screen', 'window:leave-full-screen']
+const validOnChannels = ['app-update', 'torrent-status', 'player-state', 'app:error', 'window:enter-full-screen', 'window:leave-full-screen']
 
 const electronAPI = {
   // Основные каналы общения
