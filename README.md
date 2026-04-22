@@ -13,7 +13,7 @@
 
 ## Скриншоты
 
-![AniLibrix](https://raw.githubusercontent.com/A1ex3/anilibrix-plus/main/.github/assets/anilibrix.png)
+![AniLibrix](https://raw.githubusercontent.com/aevarx/anilibrix-reborn/main/.github/assets/anilibrix.png)
 
 ## Требования
 

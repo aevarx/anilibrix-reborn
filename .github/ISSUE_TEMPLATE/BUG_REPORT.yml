@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for reporting issues of Anilibrix Plus!
+        Thanks for reporting issues of Anilibrix Reborn!
 
         Please enter detailed information below.
   - type: textarea
@@ -38,7 +38,7 @@ body:
       required: true
   - type: input
     attributes:
-      label: Version of Anilibrix Plus
+      label: Version of Anilibrix Reborn
     validations:
       required: true
   - type: dropdown

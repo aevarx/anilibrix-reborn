@@ -30,7 +30,7 @@ def extract_tar_gz(path_to_file, extract_path):
 
 def install_updater(target_dir, version, os):
     logger.info(f"Starting updater installation: version={version}, os={os}")
-    URL = 'https://github.com/A1ex3/anilibrix-plus-updater/releases/download'
+    URL = 'https://github.com/aevarx/anilibrix-reborn-updater/releases/download'
     WINDOWS_FILES_LIST = ['windows-arm64.tar.gz', 'windows-x64.tar.gz']
     LINUX_FILES_LIST = ['linux-arm64.tar.gz', 'linux-x64.tar.gz']
 

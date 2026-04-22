@@ -67,7 +67,7 @@ export default class AppUpdateFeature{
     getFullPathToUpdater() {
         if (this.getAppAndSystemInfo()['os'] === 'win') {
             this._updaterFileName += '.exe';
-            this._appName = 'AniLibrix Plus.exe' // windows
+            this._appName = 'AniLibrix Reborn.exe' // windows
         }
 
         const updaterPath = path.join(this.getAppDir(), this._updaterFileName);

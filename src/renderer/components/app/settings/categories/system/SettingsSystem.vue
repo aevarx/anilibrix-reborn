@@ -86,7 +86,7 @@
           class="mb-2"
           :value="_app_update_channel_endpoint"
           @input="_setAppUpdateChannelEndpoint($event ? $event : process.env.APP_UPDATE_CHANNEL_ENDPOINT_URL)"
-          :items="['https://api.github.com/repos/A1ex3/anilibrix-plus/releases']"
+          :items="['https://api.github.com/repos/aevarx/anilibrix-reborn/releases']"
           label="Точка подключения к каналу обновлений приложения"
           persistent-hint
         />

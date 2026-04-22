@@ -7,31 +7,31 @@
         "email": "anilibria@protonmail.com",
         "url": "https://anilibria.top"
     },
-    "description": "AniLibrix Plus - AniLibria desktop app (Anilibrix fork)",
+    "description": "AniLibrix Reborn - AniLibria desktop app (Anilibrix fork)",
     "license": "MIT",
     "main": "./dist/electron/main.js",
     "repository": {
         "type": "git",
-        "url": "https://github.com/A1ex3/anilibrix-plus"
+        "url": "https://github.com/aevarx/anilibrix-reborn"
     },
     "scripts": {
         "build": "node .electron-vue/build.js",
         "serve": "node .electron-vue/dev-runner.js",
-        "release": "yarn build && electron-builder -wml -c.compression=store --publish never",
-        "release:mac": "yarn build && electron-builder -m -c.compression=store --publish never",
-        "release:linux": "yarn build && electron-builder -l -c.compression=store --publish never",
-        "release:windows": "yarn build && electron-builder -w -c.compression=maximum --publish never",
+        "release": "pnpm run build && electron-builder --dir",
+        "release:mac": "pnpm run build && electron-builder -m -c.compression=store --publish never",
+        "release:linux": "pnpm run build && electron-builder -l -c.compression=store --publish never",
+        "release:windows": "pnpm run build && electron-builder -w -c.compression=maximum --publish never",
         "lint:fix": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter --fix src"
     },
     "meta": {
         "name": "AniLibrix",
         "links": {
-            "github": "https://github.com/A1ex3/anilibrix-plus",
+            "github": "https://github.com/aevarx/anilibrix-reborn",
             "anilibria": "https://anilibria.top"
         }
     },
     "build": {
-        "productName": "AniLibrix Plus",
+        "productName": "AniLibrix Reborn",
         "artifactName": "${productName}-${os}-${arch}-${version}.${ext}",
         "appId": "com.anilibria.anilibrix",
         "directories": {

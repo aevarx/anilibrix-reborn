@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-2022, macos-13]
+        os: [ubuntu-latest, windows-2022, macos-latest]
 
     steps:
       - name: Checkout
@@ -30,19 +30,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: yarn
+          cache: pnpm
 
-      - name: Enable Corepack and Yarn 3.6.1
+      - name: Enable Corepack and pnpm
         run: |
           corepack enable
-          corepack prepare yarn@3.6.1 --activate
-          yarn --version
+          corepack prepare pnpm@latest --activate
+          pnpm --version
 
       - name: Create .env from example
         run: node -e "require('fs').copyFileSync('.env.example', '.env')"
 
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install
 
       - name: Debug build environment
         run: |
@@ -55,7 +55,7 @@ jobs:
       - name: Build app
         env:
           NODE_OPTIONS: --openssl-legacy-provider
-        run: yarn build
+        run: pnpm run build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -63,6 +63,6 @@ jobs:
           name: anilibrix-${{ matrix.os }}-${{ github.sha }}
           if-no-files-found: warn
           path: |
-            dist/electron/**
+            dist/**
             release/**
             out/**
