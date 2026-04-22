@@ -70,6 +70,18 @@ jobs:
         with:
           python-version: '3.11'
 
+      # electron-builder's parallel `npm rebuild` races on shared node-addon-api under pnpm (MSB3491).
+      - name: Rebuild native modules for Electron (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        env:
+          PYTHON: ${{ steps.win_py311.outputs.python-path }}
+          npm_config_python: ${{ steps.win_py311.outputs.python-path }}
+        run: |
+          EV="$(node -p "require('electron/package.json').version")"
+          echo "Rebuilding native deps for Electron ${EV} (sequential)..."
+          pnpm dlx @electron/rebuild@3.6.0 -f --version="${EV}"
+
       - name: Package app (Windows installer + portable)
         if: runner.os == 'Windows'
         env:
@@ -77,7 +89,7 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: false
           PYTHON: ${{ steps.win_py311.outputs.python-path }}
           npm_config_python: ${{ steps.win_py311.outputs.python-path }}
-        run: pnpm exec electron-builder --win --x64 --publish never
+        run: pnpm exec electron-builder --win --x64 --publish never --config.npmRebuild=false
 
       - name: Package app (Linux AppImage)
         if: runner.os == 'Linux'
