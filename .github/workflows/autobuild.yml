@@ -1,0 +1,58 @@
+name: Autobuild
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: autobuild-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-2022, macos-13]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Enable Corepack and Yarn 3.6.1
+        run: |
+          corepack enable
+          corepack prepare yarn@3.6.1 --activate
+          yarn --version
+
+      - name: Create .env from example
+        run: node -e "require('fs').copyFileSync('.env.example', '.env')"
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build app
+        run: yarn build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: anilibrix-${{ matrix.os }}-${{ github.sha }}
+          if-no-files-found: warn
+          path: |
+            dist/electron/**
+            release/**
+            out/**
