@@ -62,11 +62,21 @@ jobs:
         shell: bash
         run: mkdir -p path_to_updater && touch path_to_updater/.gitkeep
 
+      # Python 3.12+ has no distutils; node-gyp 9 (used by native deps rebuild) still needs it.
+      - name: Setup Python 3.11 for node-gyp (Windows)
+        if: runner.os == 'Windows'
+        id: win_py311
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
       - name: Package app (Windows installer + portable)
         if: runner.os == 'Windows'
         env:
           NODE_OPTIONS: --openssl-legacy-provider
           CSC_IDENTITY_AUTO_DISCOVERY: false
+          PYTHON: ${{ steps.win_py311.outputs.python-path }}
+          npm_config_python: ${{ steps.win_py311.outputs.python-path }}
         run: pnpm exec electron-builder --win --x64 --publish never
 
       - name: Package app (Linux AppImage)
