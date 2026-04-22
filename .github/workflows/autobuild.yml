@@ -62,33 +62,11 @@ jobs:
         shell: bash
         run: mkdir -p path_to_updater && touch path_to_updater/.gitkeep
 
-      # Python 3.12+ has no distutils; node-gyp 9 (used by native deps rebuild) still needs it.
-      - name: Setup Python 3.11 for node-gyp (Windows)
-        if: runner.os == 'Windows'
-        id: win_py311
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      # electron-builder's parallel `npm rebuild` races on shared node-addon-api under pnpm (MSB3491).
-      - name: Rebuild native modules for Electron (Windows)
-        if: runner.os == 'Windows'
-        shell: bash
-        env:
-          PYTHON: ${{ steps.win_py311.outputs.python-path }}
-          npm_config_python: ${{ steps.win_py311.outputs.python-path }}
-        run: |
-          EV="$(node -p "require('electron/package.json').version")"
-          echo "Rebuilding native deps for Electron ${EV} (sequential)..."
-          pnpm dlx @electron/rebuild@3.6.0 -f --version="${EV}"
-
       - name: Package app (Windows installer + portable)
         if: runner.os == 'Windows'
         env:
           NODE_OPTIONS: --openssl-legacy-provider
           CSC_IDENTITY_AUTO_DISCOVERY: false
-          PYTHON: ${{ steps.win_py311.outputs.python-path }}
-          npm_config_python: ${{ steps.win_py311.outputs.python-path }}
         run: pnpm exec electron-builder --win --x64 --publish never --config.npmRebuild=false
 
       - name: Package app (Linux AppImage)
@@ -96,14 +74,14 @@ jobs:
         env:
           NODE_OPTIONS: --openssl-legacy-provider
           CSC_IDENTITY_AUTO_DISCOVERY: false
-        run: pnpm exec electron-builder --linux AppImage --x64 --publish never
+        run: pnpm exec electron-builder --linux AppImage --x64 --publish never --config.npmRebuild=false
 
       - name: Package app (macOS dmg)
         if: runner.os == 'macOS'
         env:
           NODE_OPTIONS: --openssl-legacy-provider
           CSC_IDENTITY_AUTO_DISCOVERY: false
-        run: pnpm exec electron-builder --mac dmg --publish never
+        run: pnpm exec electron-builder --mac dmg --publish never --config.npmRebuild=false
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
